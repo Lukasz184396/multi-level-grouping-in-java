@@ -1,9 +1,12 @@
 import com.lzawada.grouping.AbstractGroup;
 import com.lzawada.grouping.model.Person;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -38,13 +41,16 @@ public class Group extends AbstractGroup {
 
     //Group persons by country, city and pet name
     public void threeLevelGrouping(List<Person> persons) {
-        final Map<String, Map<String, Map<String, List<Person>>>> personsByCountryCityAndPetName = persons.stream().collect(
+        Comparator<Person> comparePersonsByDate = (o1, o2) -> o1.getDate().compareTo(o2.getDate());
+
+        System.out.println("sorted" + persons.stream().sorted(comparePersonsByDate.reversed()).collect(Collectors.toList()));
+        final Map<String, Map<String, Map<String, List<Person>>>> personsByCountryCityAndPetName = persons.stream().sorted(comparePersonsByDate.reversed()).collect(
                 groupingBy(Person::getCountry,
                         groupByCityAndPetName()
                 )
         );
         System.out.println("Persons whose pet is named 'Max' and live in NY: " +
-                personsByCountryCityAndPetName.get("USA").get("NYC").get("Max").size());
+                personsByCountryCityAndPetName.get("USA").get("NYC").get("Max"));
     }
 
     private Collector<Person, ?, Map<String, Map<String, List<Person>>>> groupByCityAndPetName() {
